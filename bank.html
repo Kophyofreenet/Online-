@@ -212,8 +212,120 @@
   
   <div class="card" role="region" aria-label="Copy Account Number">
     <div class="bank-logo">
-      <img src="Messenger_creation_4E132BF6-B6A1-46E8-8D36-7625E7A4F14B.jpeg" alt="Siam Commercial Bank Logo" />
+      <img src="bank icon ထည့်ရမည်နေရာ" alt="Siam Commercial Bank Logo" />
     </div>
     
     <div class="bank">
-      <h1>Siam Comm
+      <h1>Siam Commercial Bank</h1>
+    </div>
+    
+    <div class="account" aria-live="polite">
+      <div class="meta">
+        <div class="owner">Account Number</div>
+        <div class="number" id="account-number">745 259 0514</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <button class="btn" id="copy-btn" aria-label="Copy Account Number">
+          <span class="copy-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M16 4H8a2 2 0 00-2 2v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+              <rect x="10" y="6" width="8" height="12" rx="2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></rect>
+            </svg>
+            Copy
+          </span>
+        </button>
+        <div class="small">Name: <strong>SANG LUNGMON</strong></div>
+      </div>
+    </div>
+
+    <p class="small">ငွေလွှဲမှုအောင်မြင်တိုင်း စလစ်ကိုပို့ပြီး အကြောင်းကြားပါ ကျေးဇူးတင်ပါတယ်🙏</p>
+  </div>
+  
+  <div id="toast" class="toast" role="status" aria-live="polite">Copied!</div>
+  
+  <script>
+    // Snow effect
+    function createSnowflake() {
+      const snowflake = document.createElement('div');
+      snowflake.classList.add('snowflake');
+      
+      // Use different snowflake characters for variety
+      const snowChars = ['❄', '❅', '❆', '•'];
+      const randomChar = snowChars[Math.floor(Math.random() * snowChars.length)];
+      snowflake.innerHTML = randomChar;
+      
+      // Random properties for each snowflake
+      const size = Math.random() * 16 + 8; // 8px to 24px
+      const startPosition = Math.random() * 100; // 0% to 100%
+      const animationDuration = Math.random() * 10 + 10; // 10s to 20s
+      const animationDelay = Math.random() * 5; // 0s to 5s
+      const opacity = Math.random() * 0.7 + 0.3; // 0.3 to 1.0
+      
+      snowflake.style.left = `${startPosition}%`;
+      snowflake.style.fontSize = `${size}px`;
+      snowflake.style.animationDuration = `${animationDuration}s`;
+      snowflake.style.animationDelay = `${animationDelay}s`;
+      snowflake.style.opacity = opacity;
+      
+      // Add slight horizontal movement variation
+      const horizontalMove = Math.random() * 40 - 20; // -20px to 20px
+      snowflake.style.setProperty('--move-x', `${horizontalMove}px`);
+      
+      document.getElementById('snow-container').appendChild(snowflake);
+      
+      // Remove snowflake after animation completes
+      setTimeout(() => {
+        if (snowflake.parentNode) {
+          snowflake.remove();
+        }
+      }, (animationDuration + animationDelay) * 1000);
+    }
+    
+    // Create snowflakes continuously
+    function startSnowfall() {
+      // Create initial batch of snowflakes
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => createSnowflake(), i * 100);
+      }
+      
+      // Continue creating snowflakes
+      setInterval(createSnowflake, 200);
+    }
+    
+    // Start snowfall when page loads
+    window.addEventListener('load', startSnowfall);
+    
+    // Copy account number functionality
+    const copyBtn = document.getElementById('copy-btn');
+    const account = document.getElementById('account-number').innerText.trim();
+    const toast = document.getElementById('toast');
+
+    async function showToast(text='Copied!'){
+      toast.textContent = text;
+      toast.style.display = 'block';
+      setTimeout(()=>{toast.style.display='none'},2000);
+    }
+
+    copyBtn.addEventListener('click', async ()=>{
+      try{
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          await navigator.clipboard.writeText(account);
+        } else {
+          // fallback
+          const ta = document.createElement('textarea');
+          ta.value = account;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        showToast('Account number copied');
+      }catch(err){
+        console.error(err);
+        showToast('Unable to copy — Please try again');
+      }
+    });
+  </script>
+</body>
+  </html>
