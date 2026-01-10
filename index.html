@@ -251,13 +251,31 @@ header('Content-Type: text/html; charset=UTF-8');
     
     <script>
         const servers = [
-    { id: 'th-01', name: 'Thailand-01 SSH OVPN SSL', urls: ['http://bamar.kophyoe.online:81/server/online'] },
-    { id: 'th-02', name: 'Thailand-01 UDP', urls: ['http://bamar.kophyoe.online:81/udpserver/online'] },
-    { id: 'th-03', name: 'Thailand-02 SSH OVPN SSL', urls: ['http://bamar.kophyoe.online:81/server/online'] },
-    { id: 'th-04', name: 'Thailand-02 UDP', urls: ['http://bamar.kophyoe.online:81/udpserver/online'] },
-    { id: 'th-05', name: 'Thailand-03 SSH OVPN SSL', urls: ['http://bamar.kophyoe.online:81/server/online'] },
-    { id: 'th-06', name: 'Thailand-03 UDP', urls: ['http://bamar.kophyoe.online:81/udpserver/online'] }
-];
+  {
+    "id": "th-01",
+    "name": "TH-01",
+    "url": [
+      "http://185.78.167.193:81/udpserver/online",
+      "http://185.78.167.193:81/server/online"
+    ]
+  },
+  {
+    "id": "th-02",
+    "name": "TH-02",
+    "url": [
+      "http://43.229.132.154:81/udpserver/online",
+      "http://43.229.132.154:81/server/online"
+    ]
+  },
+  {
+    "id": "th-03",
+    "name": "TH-03",
+    "url": [
+      "http://43.229.135.97:81/udpserver/online",
+      "http://43.229.135.97:81/server/online"
+    ]
+  }
+]:
 
 
 
@@ -440,4 +458,5 @@ header('Content-Type: text/html; charset=UTF-8');
     </script>
 </body>
 </html>
+
 
