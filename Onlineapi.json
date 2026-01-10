@@ -19,32 +19,8 @@
     "id": "th-03",
     "name": "TH-03",
     "url": [
-     "http://43.229.135.97:81/udpserver/online",
+      "http://43.229.135.97:81/udpserver/online",
       "http://43.229.135.97:81/server/online"
-    ]
-  },
-  {
-    "id": "th-04",
-    "name": "TH-04",
-    "url": [
-     "",
-      ""
-    ]
-  },
-  {
-    "id": "th-05",
-    "name": "TH-05",
-    "url": [
-      "",
-      ""
-    ]
-  },
-  {
-    "id": "th-06",
-    "name": "TH-06",
-    "url": [
-      "",
-      ""
     ]
   }
 ]
