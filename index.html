@@ -1,279 +1,442 @@
+<?php
+header('Content-Type: text/html; charset=UTF-8');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Users Status List</title>
+    <title>BAMAR VPN | ONLINE Status</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-primary: #f8f9fa;
-            --bg-secondary: #fff;
-            --text-primary: #333;
-            --text-secondary: #2c3e50;
-            --border-color: #e0e0e0;
-            --table-header-bg: linear-gradient(to bottom, #3498db, #2980b9);
-            --table-row-even: #f8f9fa;
-            --table-row-hover: #e8f4fc;
-            --total-users-bg: linear-gradient(to right, #3498db, #2c3e50);
-            --status-busy: #e74c3c;
-            --status-online: #2ecc71;
-            --status-offline: #95a5a6;
-            --status-full: #9b59b6;
-            --user-count-low: #2ecc71;
-            --user-count-high: #e74c3c;
-        }
-
-        .dark-mode {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #e0e0e0;
-            --text-secondary: #f0f0f0;
-            --border-color: #444;
-            --table-header-bg: linear-gradient(to bottom, #2c3e50, #1a2a3e);
-            --table-row-even: #363636;
-            --table-row-hover: #3a4a5c;
-            --total-users-bg: linear-gradient(to right, #2c3e50, #1a2a3e);
-            --status-busy: #c0392b;
-            --status-online: #27ae60;
-            --status-offline: #7f8c8d;
-            --status-full: #8e44ad;
-            --user-count-low: #27ae60;
-            --user-count-high: #c0392b;
+            --bg-color: #050505;
+            --card-bg: #111111;
+            --accent: #00f0ff; /* Neon Cyan */
+            --success: #00ff9d; /* Neon Green */
+            --warning: #ffeb3b;
+            --danger: #ff0055;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border: #222222;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
             min-height: 100vh;
-            color: var(--text-primary);
-            background-color: var(--bg-primary);
-            transition: background-color 0.3s, color 0.3s;
-            padding-bottom: 70px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            background-color: var(--bg-secondary);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        h1 {
-            text-align: center;
-            color: var(--text-secondary);
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 15px;
-        }
-
-        table {
+        .dashboard-container {
             width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            border-radius: 10px;
+            max-width: 480px;
+        }
+
+        /* Header Style */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .brand-highlight {
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        /* Stats Box */
+        .stats-box {
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
             overflow: hidden;
         }
 
-        th, td {
-            border: 1px solid var(--border-color);
+        .stats-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .total-number {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+        }
+
+        /* Server List */
+        .server-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
             padding: 16px;
-            text-align: left;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        th {
-            background: var(--table-header-bg);
-            color: white;
+        .server-card.active-server {
+            border-color: rgba(0, 255, 157, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
-        tr:nth-child(even) { background-color: var(--table-row-even); }
-        tr:hover { background-color: var(--table-row-hover); }
-
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
+        .server-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .status-online { background-color: var(--status-online); box-shadow: 0 0 8px var(--status-online); }
-        .status-offline { background-color: var(--status-offline); }
-        .status-full { background-color: var(--status-full); }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background-color: #e0e0e0;
+        /* Progress Bar Custom */
+        .cyber-progress {
+            height: 6px;
+            background: #222;
             border-radius: 4px;
-            margin-top: 5px;
+            overflow: hidden;
+            margin-top: 12px;
         }
 
-        .progress-fill {
+        .cyber-bar {
             height: 100%;
             border-radius: 4px;
-            transition: width 0.5s;
+            box-shadow: 0 0 10px currentColor;
+            transition: width 0.5s ease;
         }
 
-        .ping-time {
-            font-weight: bold;
+        /* Status Badge */
+        .status-badge {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.75rem;
             padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+            font-weight: 600;
         }
 
-        .ping-good { background: #e8f6ef; color: #2ecc71; }
-        .ping-bad { background: #fbebee; color: #e74c3c; }
-
-        .total-users {
-            text-align: center;
-            padding: 20px;
-            background: var(--total-users-bg);
-            color: white;
-            border-radius: 10px;
-            font-size: 1.2em;
-            font-weight: bold;
+        .ping-indicator {
+            font-family: 'Chakra Petch', sans-serif;
+            color: var(--text-muted);
+            font-size: 0.8rem;
         }
 
-        .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
+        .refresh-circle {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: none;
-            background: #3498db;
-            color: white;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent);
             cursor: pointer;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s;
         }
 
-        .flag { width: 25px; vertical-align: middle; margin-right: 8px; }
+        .refresh-circle:hover, .refresh-circle.loading {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: var(--accent);
+        }
+        
+        .spin-anim {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* New Download Section Style */
+        .download-box {
+            margin-top: 40px;
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px dashed var(--accent);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .btn-cyber {
+            background: var(--accent);
+            color: #000;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+        
+        .btn-cyber:hover {
+            background: #fff;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .skeleton-text { height: 10px; background: #222; border-radius: 4px; margin-bottom: 5px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>🌐 Servers List: Online Users</h1>
-        <div style="text-align:center; color: #7f8c8d; margin-bottom: 10px;">🖥️ လူသုံးနည်းတဲ့ဆာဗာတွေရွေးချယ်ပြီးသုံးပါ</div>
-        
-        <table id="serverTable">
-            <thead>
-                <tr>
-                    <th>Status</th>
-                    <th>Server Name</th>
-                    <th>Users / Capacity</th>
-                    <th>Ping</th>
-                </tr>
-            </thead>
-            <tbody id="serverBody">
-                <tr>
-                    <td colspan="4" style="text-align: center;">Fetching data from JSON...</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="dashboard-container">
+        <div class="header-section">
+            <div class="brand-text">BAMAR <span class="brand-highlight">VPN</span></div>
+            <div class="refresh-circle" id="refreshBtn" onclick="manualRefresh()">
+                <i class="bi bi-arrow-clockwise" id="refreshIcon"></i>
+            </div>
+        </div>
 
-        <div class="total-users">Total Online Active: <span id="totalOnlineCount">0</span> Users</div>
-        <div id="lastUpdated" style="text-align:right; font-size: 0.8em; margin-top: 10px; color: #7f8c8d;">Last updated: -</div>
+        <div class="stats-box">
+            <div style="color: var(--text-muted); font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 10px;">ONLINE USERS</div>
+            <div class="total-number" id="totalOnlineCount">0</div>
+            <div style="font-size: 0.8rem; color: var(--success); margin-top: 5px;" id="systemStatus">
+                <i class="bi bi-activity"></i> CHECKING SYSTEM...
+            </div>
+        </div>
+
+        <div style="margin-bottom: 10px; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">
+            <i class="bi bi-hdd-network me-2"></i>Server Nodes
+        </div>
+
+        <div id="serverContainer"></div>
+
+        <div class="download-box">
+            <img src="https://raw.githubusercontent.com/Kophyofreenet/Bamar-VPN/refs/heads/main/IMG_20260106_142932_888.jpg" 
+                 alt="Bamar VPN Logo" 
+                 style="width: 80px; height: 80px; border-radius: 15px; margin: 0 auto 15px auto; display: block; border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent);">
+            
+            <h5 style="font-weight: 700; color: white; margin-bottom: 10px;">PHYOE VPN</h5>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+                PHYOE VPN မရှိသေးရင် အခုပဲ ဒေါင်းလိုက်ပါ။<br>Fast, Secure & Unlimited.
+            </p>
+            <a href="https://play.google.com/store/apps/details?id=com.phyoevpnth.net" target="_blank" class="btn btn-cyber w-100">
+                <i class="bi bi-google-play me-2"></i> Install From Play Store
+            </a>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; font-size: 0.7rem; color: #444;">
+            <span id="lastUpdated">CONNECTING...</span><br>
+            PHYOE NETWORK INFRASTRUCTURE
+        </div>
     </div>
-
-    <button class="theme-toggle" id="themeToggle">🌙</button>
-
+    
     <script>
-        const API_URL = 'https://raw.githubusercontent.com/Kophyofreenet/Online-/refs/heads/main/Onlineapi.json';
-        const SERVER_LIMIT = 250;
+        const servers = [
+    { id: 'th-01', name: 'Thailand-01 SSH OVPN SSL', urls: ['http://bamar.kophyoe.online:81/server/online'] },
+    { id: 'th-02', name: 'Thailand-01 UDP', urls: ['http://bamar.kophyoe.online:81/udpserver/online'] },
+    { id: 'th-03', name: 'Thailand-02 SSH OVPN SSL', urls: ['http://bamar.kophyoe.online:81/server/online'] },
+    { id: 'th-04', name: 'Thailand-02 UDP', urls: ['http://bamar.kophyoe.online:81/udpserver/online'] },
+    { id: 'th-05', name: 'Thailand-03 SSH OVPN SSL', urls: ['http://bamar.kophyoe.online:81/server/online'] },
+    { id: 'th-06', name: 'Thailand-03 UDP', urls: ['http://bamar.kophyoe.online:81/udpserver/online'] }
+];
 
-        async function fetchServerData() {
-            try {
-                const response = await fetch(API_URL);
-                const servers = await response.json();
-                renderTable(servers);
-            } catch (error) {
-                console.error("Error loading JSON:", error);
-                document.getElementById('serverBody').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Failed to load API data.</td></tr>';
+
+
+        const LIMIT = 250;
+        const proxies = [
+            url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+            url => `https://corsproxy.io/?${encodeURIComponent(url)}`
+        ];
+
+        // STORE STATE (To prevent flashing 0)
+        let serverValues = {};
+        
+        // Init state with 0 for all servers
+        servers.forEach(s => serverValues[s.id] = 0);
+
+        function initLayout() {
+            const container = document.getElementById('serverContainer');
+            if (container.children.length === 0) {
+                servers.forEach(srv => {
+                    const el = document.createElement('div');
+                    el.id = srv.id;
+                    el.className = 'server-card';
+                    el.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="server-name" style="color: #444">${srv.name}</span>
+                            <span class="status-badge" style="color: #444">...</span>
+                        </div>
+                        <div class="skeleton-text" style="width: 100%; margin-top: 15px;"></div>
+                    `;
+                    container.appendChild(el);
+                });
             }
         }
 
-        async function getPing(url) {
-            const start = Date.now();
-            try {
-                // We use a small timeout for ping
-                await fetch(url, { mode: 'no-cors', cache: 'no-cache' });
-                return Date.now() - start;
-            } catch (e) {
-                return "Error";
-            }
-        }
-
-        async function renderTable(servers) {
-            const tbody = document.getElementById('serverBody');
-            tbody.innerHTML = '';
-            let totalUsers = 0;
-
-            for (const server of servers) {
-                const row = document.createElement('tr');
-                
-                // Fetch user count (Assuming your API gives it or we fetch from server URL)
-                // If API only contains URLs, we fetch from each. 
-                // Based on your previous code, let's fetch the text response from the URL.
-                let onlineCount = 0;
-                let ping = "--";
-                
+        async function apiFetch(url) {
+            for (let proxy of proxies) {
                 try {
-                    const start = Date.now();
-                    // Using a CORS proxy as in your original script
-                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(server.url)}`;
-                    const res = await fetch(proxyUrl);
-                    const text = await res.text();
-                    onlineCount = parseInt(text) || 0;
-                    if (onlineCount > SERVER_LIMIT) onlineCount = SERVER_LIMIT;
-                    ping = Date.now() - start;
-                } catch (e) {
-                    onlineCount = 0;
-                    ping = "Error";
-                }
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 2000); 
 
-                totalUsers += onlineCount;
-                const percent = Math.round((onlineCount / SERVER_LIMIT) * 100);
-                const status = onlineCount >= SERVER_LIMIT ? "Full" : (onlineCount > 0 ? "Online" : "Offline");
-                const statusClass = onlineCount >= SERVER_LIMIT ? "status-full" : (onlineCount > 0 ? "status-online" : "status-offline");
-                
-                const countryCode = server.name.split('-')[0].toLowerCase();
-                const pingClass = typeof ping === 'number' && ping < 300 ? 'ping-good' : 'ping-bad';
-
-                row.innerHTML = `
-                    <td><span class="status-indicator ${statusClass}"></span>${status}</td>
-                    <td><img src="https://flagcdn.com/w40/${countryCode}.png" class="flag"> ${server.name}</td>
-                    <td>
-                        <div style="display:flex; justify-content:space-between; font-size:0.9em;">
-                            <span>${onlineCount} / ${SERVER_LIMIT}</span>
-                            <span>${percent}%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${percent}%; background: ${percent > 80 ? '#e74c3c' : '#2ecc71'}"></div>
-                        </div>
-                    </td>
-                    <td><span class="ping-time ${pingClass}">${ping} ${typeof ping === 'number' ? 'ms' : ''}</span></td>
-                `;
-                tbody.appendChild(row);
+                    const r = await fetch(proxy(url), { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
+                    if(r.ok) {
+                        const text = await r.text();
+                        const num = parseInt(text.trim());
+                        if (!isNaN(num)) return num;
+                    }
+                } catch(e) { }
             }
-
-            document.getElementById('totalOnlineCount').textContent = totalUsers;
-            document.getElementById('lastUpdated').textContent = "Last updated: " + new Date().toLocaleString();
+            return null;
         }
 
-        // Theme Toggle
-        const themeBtn = document.getElementById('themeToggle');
-        themeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            themeBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-        });
+        // Calculates Total based on SAVED values
+        function recalculateTotal() {
+            let total = 0;
+            let activeCount = 0;
+            
+            Object.values(serverValues).forEach(val => {
+                total += val;
+                if(val > 0) activeCount++;
+            });
 
-        // Run
-        fetchServerData();
-        setInterval(fetchServerData, 60000); // Auto refresh every 1 min
+            // Update Total UI
+            const totalEl = document.getElementById('totalOnlineCount');
+            totalEl.innerText = total;
+            totalEl.style.color = total > 0 ? 'var(--text-main)' : '#666';
+
+            // Update System Status
+            const statusEl = document.getElementById('systemStatus');
+            if(activeCount > 0) {
+                statusEl.innerHTML = '<i class="bi bi-activity"></i> SYSTEM OPTIMAL';
+                statusEl.style.color = 'var(--success)';
+            } else {
+                statusEl.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ALL SERVERS OFFLINE';
+                statusEl.style.color = 'var(--danger)';
+            }
+        }
+
+        async function processServer(srv) {
+            const results = await Promise.all(srv.urls.map(u => apiFetch(u)));
+            
+            let count = 0;
+            let active = false;
+
+            results.forEach(val => {
+                if (val !== null) { count += val; active = true; }
+            });
+
+            if (count > LIMIT) count = LIMIT;
+
+            // SAVE TO STATE (Crucial Step)
+            serverValues[srv.id] = count;
+            
+            // Trigger UI Recalculation Immediately
+            recalculateTotal();
+
+            // Calculate Card Percent
+            const percent = Math.round((count / LIMIT) * 100);
+            
+            // Color Logic
+            let color = 'var(--success)';
+            let statusText = 'ONLINE';
+            let statusColor = 'var(--success)';
+            
+            if (percent > 90) { 
+                color = 'var(--danger)'; statusText = 'FULL'; statusColor = 'var(--danger)';
+            } else if (percent > 70) { 
+                color = 'var(--warning)'; statusText = 'BUSY'; statusColor = 'var(--warning)';
+            }
+            
+            if (!active) {
+                // If fetch failed completely, we keep it as 0
+                color = '#333'; statusText = 'OFFLINE'; statusColor = '#666';
+            }
+
+            // Update Card UI
+            const el = document.getElementById(srv.id);
+            if (el) {
+                if(active) el.classList.add('active-server');
+                else el.classList.remove('active-server');
+
+                el.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-hdd-fill me-2" style="color: ${active ? color : '#333'}"></i>
+                            <span class="server-name">${srv.name}</span>
+                        </div>
+                        <span class="status-badge" style="color: ${statusColor}; border: 1px solid ${statusColor}40">
+                            ${statusText}
+                        </span>
+                    </div>
+                    <div class="cyber-progress">
+                        <div class="cyber-bar" style="width: ${percent}%; background-color: ${color}; box-shadow: 0 0 10px ${color}"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2 align-items-center">
+                        <span class="ping-indicator"><i class="bi bi-people-fill"></i> ${count}/${LIMIT}</span>
+                        <span style="font-family: 'Chakra Petch'; font-weight: bold; color: ${color}">${percent}%</span>
+                    </div>
+                `;
+            }
+        }
+
+        let isRefreshing = false;
+
+        async function refresh() {
+            if(isRefreshing) return;
+            isRefreshing = true;
+            
+            // Start Loading UI (But do NOT reset Total to 0)
+            document.getElementById('refreshBtn').classList.add('loading');
+            document.getElementById('refreshIcon').classList.add('spin-anim');
+            
+            // Update Text to indicate refresh
+            const statusEl = document.getElementById('systemStatus');
+            const prevText = statusEl.innerHTML;
+            statusEl.innerHTML = '<i class="bi bi-hourglass-split"></i> UPDATING...';
+
+            initLayout(); 
+            
+            // Fetch All Parallely
+            const tasks = servers.map(srv => processServer(srv));
+            await Promise.all(tasks);
+            
+            // Finished
+            document.getElementById('lastUpdated').innerText = 'LAST SYNC: ' + new Date().toLocaleTimeString().toUpperCase();
+            
+            document.getElementById('refreshBtn').classList.remove('loading');
+            document.getElementById('refreshIcon').classList.remove('spin-anim');
+            isRefreshing = false;
+        }
+
+        function manualRefresh() { refresh(); }
+
+        // Initial Run
+        refresh();
+        // Auto Loop
+        setInterval(refresh, 5000); 
+        
     </script>
 </body>
 </html>
